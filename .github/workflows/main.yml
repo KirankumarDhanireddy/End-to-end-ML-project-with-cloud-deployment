@@ -30,7 +30,17 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
-
+            - name: Free up disk space
+              run: |
+                  echo "Before cleanup:"
+                  df -h
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf /opt/ghc
+                  sudo rm -rf /usr/local/share/boost
+                  sudo rm -rf /opt/hostedtoolcache
+                  docker system prune -af || true
+                  echo "After cleanup:"
+                  df -h
             - name: Install utilities
               run: |
                 sudo apt-get update
@@ -54,7 +64,7 @@ jobs:
                 ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
                 IMAGE_TAG: latest
               run: |
-                docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+                docker build --no-cache -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
                 echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
@@ -75,6 +85,12 @@ jobs:
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v1
+
+            - name: Clean up old Docker data
+              run: |
+                  docker stop $(docker ps -aq) || true
+                  docker rm $(docker ps -aq) || true
+                  docker system prune -af || true
               
             - name: Pull Docker image from ECR
               run: |
