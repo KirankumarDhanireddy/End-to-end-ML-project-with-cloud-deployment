@@ -1,4 +1,4 @@
-# Docker setup in new AWS ubuntu/linux machine
+## Docker setup in new AWS ubuntu/linux machine
 
 sudo apt-get update -y
 
