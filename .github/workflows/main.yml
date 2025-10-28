@@ -1,11 +1,7 @@
 name: AWS deployment with Docker
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README.md'
+  workflow_dispatch:
 
 permissions:
   id-token: write
