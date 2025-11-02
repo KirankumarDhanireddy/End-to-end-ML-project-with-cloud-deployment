@@ -15,39 +15,6 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v3
 
-        - name: Install utilities
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y jq unzip
-
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v1
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_REGION }}
-
-        # ✅ Free up space before pulling large Docker image
-        - name: Free up disk space
-          run: |
-            echo "Disk usage before cleanup:"
-            df -h
-            docker system prune -af || true
-            sudo rm -rf /usr/share/dotnet
-            sudo rm -rf /usr/local/lib/android
-            sudo rm -rf /opt/ghc
-            sudo rm -rf /opt/hostedtoolcache
-            echo "Disk usage after cleanup:"
-            df -h
-
-        - name: Log in to Amazon ECR
-          id: login-ecr
-          uses: aws-actions/amazon-ecr-login@v2
-
-        - name: Pull Docker image from ECR
-          run: |
-            docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-
     build-and-push-ecr-image:
         name: Build and Push Docker image to AWS ECR
         needs: integration
