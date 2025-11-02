@@ -46,7 +46,7 @@ jobs:
 
         - name: Pull Docker image from ECR
           run: |
-            docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+            docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
     build-and-push-ecr-image:
         name: Build and Push Docker image to AWS ECR
